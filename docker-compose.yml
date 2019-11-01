@@ -1,0 +1,45 @@
+version: "3.5" 
+services: 
+  service_user: 
+    build: ./user-service/
+    container_name: service_user
+    image: service_user
+    ports: 
+      - "3001:3001"
+    volumes: 
+      - "./user-service/:/usr/src/app"
+      - /usr/src/app/node_modules
+    networks:
+      - service_network
+  
+  service_movie: 
+    build: ./movie-service/
+    container_name: service_movie
+    image: service_movie
+    ports: 
+      - "3002:3002"
+    volumes: 
+      - "./movie-service/:/usr/src/app"
+      - /usr/src/app/node_modules
+    networks:
+      - service_network
+
+  api_gateway: 
+    build: ./gateway/
+    container_name: api_gateway
+    image: api_gateway
+    ports: 
+      - "3000:3000"
+    volumes: 
+      - "./gateway/:/usr/src/app"
+      - /usr/src/app/node_modules
+    depends_on: 
+      - service_movie
+      - service_user
+    networks:
+      - service_network
+      
+networks:
+  service_network:
+    driver: bridge
+    name: service_network
